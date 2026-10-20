@@ -1,0 +1,52 @@
+// DoniaLink Accounting - interactive financial reports
+.o_dl_report {
+    .o_dl_report_body {
+        max-width: 1200px;
+        &.o_dl_wide {
+            max-width: none;
+        }
+    }
+    .o_dl_report_table {
+        td, th {
+            vertical-align: middle;
+        }
+        th {
+            white-space: nowrap;
+        }
+        .o_dl_name {
+            min-width: 18rem;
+            a {
+                text-decoration: none;
+            }
+        }
+        .o_dl_section .o_dl_name, .o_dl_item .o_dl_name {
+            white-space: nowrap;
+        }
+        .o_dl_account .o_dl_name a:hover {
+            text-decoration: underline;
+        }
+        .o_dl_section td {
+            font-weight: 600;
+        }
+        .o_dl_section.o_dl_level_0 td {
+            font-size: 1.05rem;
+            border-top: 2px solid var(--border-color, #dee2e6);
+        }
+        .o_dl_item td, .o_dl_initial td, .o_dl_more td {
+            font-size: 0.875rem;
+        }
+        .o_dl_initial td {
+            font-style: italic;
+        }
+        .o_dl_text {
+            max-width: 22rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .o_dl_total td {
+            font-weight: 700;
+            border-top: 2px solid var(--border-color, #dee2e6);
+        }
+    }
+}

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="base_accounting_kit.DynamicReport">
+        <div class="o_action o_dl_report h-100 overflow-auto">
+            <div class="o_dl_report_header border-bottom bg-view px-3 py-2 sticky-top">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <button class="btn btn-primary btn-sm" t-on-click="printPdf">PDF</button>
+                    <button class="btn btn-secondary btn-sm" t-on-click="exportXlsx">XLSX</button>
+                    <div class="vr mx-1"/>
+                    <select class="form-select form-select-sm w-auto" t-on-change="onDateFilter"
+                            aria-label="Period">
+                        <t t-foreach="filters" t-as="f" t-key="f[0]">
+                            <option t-att-value="f[0]" t-att-selected="state.options.date_filter === f[0]"
+                                    t-esc="f[1]"/>
+                        </t>
+                    </select>
+                    <t t-if="state.options.date_filter === 'custom'">
+                        <input t-if="!isAsOf" type="date"
+                               class="form-control form-control-sm w-auto" aria-label="From"
+                               t-att-value="state.options.date_from or ''"
+                               t-on-change="(ev) => this.onCustomDate('date_from', ev)"/>
+                        <input type="date" class="form-control form-control-sm w-auto" aria-label="To"
+                               t-att-value="state.options.date_to or ''"
+                               t-on-change="(ev) => this.onCustomDate('date_to', ev)"/>
+                    </t>
+                    <select t-if="hasPartnerType" class="form-select form-select-sm w-auto" aria-label="Accounts"
+                            t-on-change="(ev) => this.onOption('partner_type', ev)">
+                        <t t-foreach="partnerTypes" t-as="p" t-key="p[0]">
+                            <option t-att-value="p[0]" t-att-selected="state.options.partner_type === p[0]"
+                                    t-esc="p[1]"/>
+                        </t>
+                    </select>
+                    <select class="form-select form-select-sm w-auto" aria-label="Entries"
+                            t-on-change="(ev) => this.onOption('target_move', ev)">
+                        <option value="posted" t-att-selected="state.options.target_move === 'posted'">Posted entries</option>
+                        <option value="all" t-att-selected="state.options.target_move === 'all'">Including drafts</option>
+                    </select>
+                    <select t-if="canCompare" class="form-select form-select-sm w-auto"
+                            aria-label="Comparison" t-on-change="(ev) => this.onOption('comparison', ev)">
+                        <option value="none" t-att-selected="state.options.comparison === 'none'">No comparison</option>
+                        <option value="previous_period" t-att-selected="state.options.comparison === 'previous_period'">Previous period</option>
+                        <option value="previous_year" t-att-selected="state.options.comparison === 'previous_year'">Same period last year</option>
+                    </select>
+                    <input t-if="isLazy" type="search" class="form-control form-control-sm w-auto"
+                           placeholder="Search…" aria-label="Search"
+                           t-model="state.search" t-on-keydown="onSearch" t-on-change="onSearch"/>
+                    <div t-if="!isLazy" class="form-check form-switch ms-1 mb-0">
+                        <input class="form-check-input" type="checkbox" id="dl_hide_zero"
+                               t-att-checked="state.options.hide_zero"
+                               t-on-change="(ev) => this.onOption('hide_zero', ev)"/>
+                        <label class="form-check-label small" for="dl_hide_zero">Hide zero lines</label>
+                    </div>
+                    <div class="ms-auto d-flex gap-1" t-if="reportKey !== 'trial_balance'">
+                        <button class="btn btn-link btn-sm" t-on-click="() => this.foldAll(false)">Unfold all</button>
+                        <button class="btn btn-link btn-sm" t-on-click="() => this.foldAll(true)">Fold all</button>
+                    </div>
+                </div>
+            </div>
+
+            <div t-if="state.report" class="o_dl_report_body px-3 py-3" t-att-class="{ 'opacity-50': state.loading, 'o_dl_wide': isLazy }">
+                <h2 class="mb-0" t-esc="state.report.title"/>
+                <div class="text-muted mb-3">
+                    <span t-esc="state.report.company"/> · <span t-esc="state.report.period_label"/>
+                </div>
+                <table class="table table-sm table-hover o_dl_report_table">
+                    <thead>
+                        <tr>
+                            <th/>
+                            <th t-foreach="state.report.columns" t-as="col" t-key="col_index"
+                                t-att-class="isNumeric(col) ? 'text-end' : ''" t-esc="col.name"/>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="visibleLines" t-as="line" t-key="line.id"
+                            t-att-class="'o_dl_' + line.kind + ' o_dl_level_' + Math.min(line.level, 5)">
+                            <td class="o_dl_name" t-att-style="'padding-inline-start: ' + (0.5 + line.level * 1.25) + 'rem'">
+                                <t t-if="line.foldable">
+                                    <a href="#" class="text-reset" t-on-click.prevent="() => this.toggle(line)">
+                                        <i t-att-class="'fa fa-fw ' + (isOpen(line) ? 'fa-caret-down' : 'fa-caret-right')"/>
+                                        <t t-esc="line.name"/>
+                                    </a>
+                                </t>
+                                <t t-elif="isClickable(line)">
+                                    <a href="#" t-on-click.prevent="() => this.openLine(line)" t-esc="line.name"/>
+                                </t>
+                                <t t-else="" t-esc="line.name"/>
+                            </td>
+                            <td t-foreach="line.values" t-as="value" t-key="value_index"
+                                t-att-class="{
+                                    'text-end text-nowrap': isNumeric(state.report.columns[value_index]),
+                                    'o_dl_text': !isNumeric(state.report.columns[value_index]),
+                                    'text-danger': isNegative(value, state.report.columns[value_index]),
+                                }"
+                                t-esc="format(value, state.report.columns[value_index])"/>
+                        </tr>
+                    </tbody>
+                </table>
+                <div t-if="!state.report.lines.length" class="text-muted text-center py-5">No entries for this period.</div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -6,6 +6,7 @@ import traceback
 
 from odoo.tools.safe_eval import safe_eval
 
+from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
 _logger = logging.getLogger(__name__)
@@ -241,7 +242,7 @@ class TestDynamicLedgers(TransactionCase):
         expected = sum(self.env['account.move.line'].search([
             ('parent_state', '=', 'posted'), ('company_id', '=', self.env.company.id), ('date', '<=', '2026-12-31'),
             ('account_id.account_type', 'in', ('asset_receivable', 'liability_payable'))]).mapped('balance'))
-        self.assertAlmostEqual(total['values'][5], expected, 2)
+        self.assertAlmostEqual(total['values'][6], expected, 2)
         for section in [l for l in report['lines'] if l['kind'] == 'section'][:3]:
             self.Report.get_children('partner_ledger', self.wide, section['id'])
 
@@ -292,3 +293,93 @@ class TestDynamicLedgers(TransactionCase):
             pdf = self.Report.action_print_pdf(key, self.wide)
             self.assertEqual(pdf['type'], 'ir.actions.report', key)
             self.assertEqual(self.Report.get_xlsx(key, self.wide)[:2], b'PK', key)
+
+
+@tagged('post_install', '-at_install')
+class TestPartnerReconcileAndStatement(TransactionCase):
+    """Reconcile button of the partner ledger and statement of account of a contact (DoniaLink)."""
+
+    def setUp(self):
+        super().setUp()
+        self.Report = self.env['account.dynamic.report']
+        self.partner = self.env['res.partner'].create({'name': 'Statement Test Customer'})
+        self.invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice', 'partner_id': self.partner.id, 'invoice_date': '2026-03-05',
+            'invoice_date_due': '2026-03-20',
+            'invoice_line_ids': [(0, 0, {'name': 'Coffee', 'quantity': 1, 'price_unit': 150.0, 'tax_ids': []})],
+        })
+        self.invoice.action_post()
+        # a payment booked as a plain entry, left open: what users reconcile by hand
+        receivable = self.invoice.line_ids.filtered(lambda l: l.account_id.account_type == 'asset_receivable')
+        journal = self.env['account.journal'].search([('type', '=', 'general'),
+                                                      ('company_id', '=', self.env.company.id)], limit=1)
+        other = self.env['account.account'].search([('account_type', '=', 'asset_cash'),
+                                                    ('company_ids', 'in', self.env.company.id)], limit=1)
+        self.payment = self.env['account.move'].create({
+            'move_type': 'entry', 'journal_id': journal.id, 'date': '2026-03-10',
+            'line_ids': [
+                (0, 0, {'account_id': receivable.account_id.id, 'partner_id': self.partner.id,
+                        'name': 'Cash received', 'credit': 100.0}),
+                (0, 0, {'account_id': other.id, 'name': 'Cash received', 'debit': 100.0}),
+            ],
+        })
+        self.payment.action_post()
+        self.options = {'date_filter': 'custom', 'date_from': '2026-03-01', 'date_to': '2026-03-31',
+                        'partner_type': 'receivable'}
+
+    def _items(self):
+        action = self.Report.action_reconcile_partner('partner_ledger', self.options, self.partner.id)
+        return self.env['account.move.line'].search(action['domain'])
+
+    def test_ledger_filtered_on_partner(self):
+        report = self.Report.get_report('partner_ledger', dict(self.options, partner_id=self.partner.id))
+        sections = [l for l in report['lines'] if l['kind'] == 'section']
+        self.assertEqual([s['partner_id'] for s in sections], [self.partner.id])
+        self.assertTrue(sections[0]['reconcilable'])
+        self.assertAlmostEqual(sections[0]['values'][6], 50.0, 2)
+        self.assertEqual(report['options']['partner_name'], self.partner.display_name)
+
+    def test_reconcile_and_unreconcile(self):
+        items = self._items()
+        self.assertEqual(len(items), 2)
+        with self.assertRaises(UserError):
+            items.filtered(lambda l: l.debit).action_dl_reconcile()  # one side only
+        result = items.action_dl_reconcile()
+        self.assertEqual(result['params']['next']['tag'], 'soft_reload')
+        self.assertAlmostEqual(self.invoice.amount_residual, 50.0, 2)  # partial: 150 - 100
+        self.assertTrue(all(items.mapped('matching_number')))
+        children = self.Report.get_children('partner_ledger', self.options, 'partner-%s' % self.partner.id)
+        self.assertTrue(all(c['values'][3] for c in children if c['kind'] == 'item'))
+        items.action_dl_unreconcile()
+        self.assertAlmostEqual(self.invoice.amount_residual, 150.0, 2)
+        with self.assertRaises(UserError):
+            items.action_dl_unreconcile()
+
+    def test_statement_matches_ledger(self):
+        st = self.partner._dl_statement('2026-03-01', '2026-03-31', 'receivable')
+        self.assertEqual(len(st['lines']), 2)
+        self.assertAlmostEqual(st['opening'], 0.0, 2)
+        self.assertAlmostEqual(st['closing'], 50.0, 2)
+        self.assertAlmostEqual(st['lines'][-1]['balance'], 50.0, 2)
+        self.assertAlmostEqual(sum(b['amount'] for b in st['ageing']), 50.0, 2)
+        later = self.partner._dl_statement('2026-04-01', '2026-04-30', 'receivable')
+        self.assertAlmostEqual(later['opening'], 50.0, 2)
+        self.assertFalse(later['lines'])
+
+    def test_statement_outputs(self):
+        wizard = self.env['partner.statement.wizard'].with_context(
+            default_partner_id=self.partner.id).create({'date_from': '2026-03-01', 'date_to': '2026-03-31'})
+        self.assertEqual(wizard.account_type, 'receivable')
+        pdf = wizard.action_print_pdf()
+        report = self.env['ir.actions.report']._get_report_from_name(pdf['report_name'])
+        html = report._render_qweb_html(report.report_name, self.partner.ids, data=pdf['data'])[0]
+        self.assertIn(b'Statement Test Customer', html)
+        self.assertEqual(wizard.get_xlsx(wizard._report_data())[:2], b'PK')
+        self.assertIn('/donialink_accounting/partner_statement/xlsx?', wizard.action_print_xlsx()['url'])
+        ledger = wizard.action_open_ledger()
+        self.assertEqual(ledger['params']['options']['partner_id'], self.partner.id)
+        ledger_pdf = self.Report.action_print_pdf('partner_ledger', ledger['params']['options'])
+        self.assertEqual(ledger_pdf['report_name'], 'base_accounting_kit.report_partner_statement')
+        mail = wizard.action_send_email()
+        self.assertEqual(mail['res_model'], 'mail.compose.message')
+        self.assertEqual(len(mail['context']['default_attachment_ids']), 1)

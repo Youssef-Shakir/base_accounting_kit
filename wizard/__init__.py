@@ -35,3 +35,4 @@ from . import cash_flow_report
 from . import financial_report
 from . import import_bank_statement
 from . import kit_account_tax_report
+from . import partner_statement

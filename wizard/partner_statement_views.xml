@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Statement of account of a contact (DoniaLink) -->
+    <record id="partner_statement_wizard_view_form" model="ir.ui.view">
+        <field name="name">partner.statement.wizard.view.form</field>
+        <field name="model">partner.statement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Statement of Account">
+                <group>
+                    <group>
+                        <field name="partner_id" options="{'no_create': True}"/>
+                        <field name="account_type" widget="radio"/>
+                    </group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="target_move" widget="radio"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_print_pdf" type="object" string="Print PDF" class="btn-primary"
+                            data-hotkey="q"/>
+                    <button name="action_print_xlsx" type="object" string="Excel" class="btn-secondary"/>
+                    <button name="action_send_email" type="object" string="Send by Email" class="btn-secondary"/>
+                    <button name="action_open_ledger" type="object" string="Open in Partner Ledger"
+                            class="btn-secondary" groups="account.group_account_readonly,account.group_account_invoice"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

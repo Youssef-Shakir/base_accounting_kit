@@ -51,6 +51,10 @@ class AccountDynamicReport(models.AbstractModel):
         previous = previous or {}
         if report_key == 'partner_ledger':
             options['partner_type'] = previous.get('partner_type') if previous.get('partner_type') in ACCOUNT_TYPES else 'both'
+            # one partner only, e.g. when opened from the contact's statement
+            partner = self.env['res.partner'].browse(int(previous.get('partner_id') or 0)).exists()
+            options['partner_id'] = partner.id
+            options['partner_name'] = partner.display_name or ''
         elif report_key == 'aged_balance':
             options['partner_type'] = previous.get('partner_type') if previous.get('partner_type') in (
                 'receivable', 'payable') else 'receivable'
@@ -210,13 +214,16 @@ class AccountDynamicReport(models.AbstractModel):
     def _partner_ledger_columns(self):
         return [{'name': _('Date'), 'type': 'text'},
                 {'name': _('Account'), 'type': 'text'}, {'name': _('Label'), 'type': 'text'},
+                {'name': _('Matching'), 'type': 'text'},
                 {'name': _('Debit')}, {'name': _('Credit')}, {'name': _('Balance')}]
 
     @api.model
     def _pl_domain(self, options):
         domain = self._aml_domain(options) + [
             ('account_id.account_type', 'in', ACCOUNT_TYPES[options['partner_type']])]
-        if options['search']:
+        if options.get('partner_id'):
+            domain.append(('partner_id', '=', options['partner_id']))
+        if options.get('search'):
             domain.append(('partner_id.name', 'ilike', options['search']))
         return domain
 
@@ -250,13 +257,13 @@ class AccountDynamicReport(models.AbstractModel):
             lines.append({
                 'id': line_id, 'parent_id': None, 'ancestors': [], 'kind': 'section', 'level': 0,
                 'name': partner.display_name if partner else _('Unknown partner'),
-                'values': [None, None, None, debit, credit, end],
-                'foldable': True, 'lazy': True, 'partner_id': pid or 0,
+                'values': [None, None, None, None, debit, credit, end],
+                'foldable': True, 'lazy': True, 'partner_id': pid or 0, 'reconcilable': bool(pid),
             })
             if options['unfold_all']:
                 lines += self._pl_items(options, pid, initial.get(pid, 0.0), line_id)
         lines.append({'id': 'total', 'parent_id': None, 'ancestors': [], 'kind': 'total', 'level': 0,
-                      'name': _('Total'), 'values': [None, None, None] + totals, 'foldable': False})
+                      'name': _('Total'), 'values': [None, None, None, None] + totals, 'foldable': False})
         return columns, lines
 
     @api.model
@@ -264,7 +271,7 @@ class AccountDynamicReport(models.AbstractModel):
         lines = []
         if not self.env.company.currency_id.is_zero(initial):
             lines.append(self._child(parent_id, '%s-initial' % parent_id, _('Initial Balance'), 'initial',
-                                     [None, None, None, None, None, initial]))
+                                     [None, None, None, None, None, None, initial]))
         items = self.env['account.move.line'].search(
             self._pl_domain(options) + [('partner_id', '=', partner_id or False),
                                         ('date', '>=', options['date_from']), ('date', '<=', options['date_to'])],
@@ -275,13 +282,33 @@ class AccountDynamicReport(models.AbstractModel):
             lines.append(self._child(
                 parent_id, 'aml-%s' % aml.id, aml.move_id.name, 'item',
                 [self._date_text(aml.date), aml.account_id.code or aml.account_id.name,
-                 aml.name or '', aml.debit, aml.credit, running],
+                 aml.name or '', aml.matching_number or '', aml.debit, aml.credit, running],
                 move_id=aml.move_id.id))
         if len(items) > ITEMS_LIMIT:
             lines.append(self._child(parent_id, '%s-more' % parent_id,
                                      _('More items: open all the journal items of this partner'), 'more',
-                                     [None] * 6, partner_id=partner_id or 0))
+                                     [None] * 7, partner_id=partner_id or 0))
         return lines
+
+    @api.model
+    def action_reconcile_partner(self, report_key, options, partner_id):
+        """The partner's receivable / payable items, open ones first, to select and reconcile."""
+        self._check_access()
+        options = self.get_options(report_key, options)
+        partner = self.env['res.partner'].browse(int(partner_id or 0)).exists()
+        if not partner:
+            raise UserError(_('Items without a partner cannot be reconciled from here.'))
+        domain = [('company_id', '=', self.env.company.id), ('parent_state', '=', 'posted'),
+                  ('partner_id', '=', partner.id), ('account_id.reconcile', '=', True),
+                  ('account_id.account_type', 'in', ACCOUNT_TYPES[options.get('partner_type') or 'both'])]
+        return {
+            'type': 'ir.actions.act_window', 'name': _('Reconcile: %s', partner.display_name),
+            'res_model': 'account.move.line', 'domain': domain,
+            'views': [(self.env.ref('base_accounting_kit.account_move_line_view_list_reconcile').id, 'list'),
+                      (False, 'form')],
+            'context': {'create': False, 'search_default_unreconciled': 1},
+            'target': 'current',
+        }
 
     # ------------------------------------------------------------------
     # Aged partner balance
@@ -383,6 +410,12 @@ class AccountDynamicReport(models.AbstractModel):
             return super().action_print_pdf(report_key, options)
         self._check_access()
         options = self.get_options(report_key, options)
+        if report_key == 'partner_ledger' and options['partner_id']:
+            # one partner: its statement of account, the old PDF cannot filter on a partner
+            partner = self.env['res.partner'].browse(options['partner_id'])
+            return self.env.ref('base_accounting_kit.action_report_partner_statement').report_action(partner, data={
+                'partner_id': partner.id, 'date_from': options['date_from'], 'date_to': options['date_to'],
+                'account_type': options['partner_type'], 'target_move': options['target_move']})
         selection = {'receivable': 'customer', 'payable': 'supplier', 'both': 'customer_supplier'}
         if report_key == 'general_ledger':
             wizard = self.env['account.report.general.ledger'].create({

@@ -30,13 +30,16 @@ export class DynamicReport extends Component {
         this.reportKey = this.props.action.params?.report_key || "profit_and_loss";
         // the action state is kept in the URL, so it is stored as text
         const saved = this.props.state || {};
-        let options = {};
+        // options given by the opening action (e.g. one partner, unfolded) apply until the user changes them
+        let options = { ...(this.props.action.params?.options || {}) };
         try {
-            options = saved.dl_options ? JSON.parse(saved.dl_options) : {};
+            if (saved.dl_options) {
+                options = JSON.parse(saved.dl_options);
+                delete options.unfold_all;
+            }
         } catch {
-            options = {};
+            // keep the action's options
         }
-        delete options.unfold_all;
         this.state = useState({
             report: null,
             options,
@@ -59,6 +62,9 @@ export class DynamicReport extends Component {
         useSetupAction({ getLocalState: () => this.localState() });
         onWillStart(async () => {
             await this.load();
+            if (this.state.options.unfold_all) {
+                this.state.unfolded = new Set(this.loaded);
+            }
             await this.restoreUnfolded();
         });
     }
@@ -166,6 +172,9 @@ export class DynamicReport extends Component {
         this.state.unfolded = new Set();
         await this.load({ ...changes, unfold_all: false });
     }
+    clearPartner() {
+        this.reload({ partner_id: false });
+    }
 
     // ---------- lines ----------
 
@@ -260,6 +269,17 @@ export class DynamicReport extends Component {
         if (action) {
             this.action.doAction(action);
         }
+    }
+    canReconcile(line) {
+        return this.reportKey === "partner_ledger" && line.reconcilable;
+    }
+    async reconcilePartner(line) {
+        const action = await this.orm.call("account.dynamic.report", "action_reconcile_partner", [
+            this.reportKey,
+            this.state.options,
+            line.partner_id,
+        ]);
+        this.action.doAction(action);
     }
 
     // ---------- formatting ----------

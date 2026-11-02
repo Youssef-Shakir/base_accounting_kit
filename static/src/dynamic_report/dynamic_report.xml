@@ -50,6 +50,11 @@
                                t-on-change="(ev) => this.onOption('hide_zero', ev)"/>
                         <label class="form-check-label small" for="dl_hide_zero">Hide zero lines</label>
                     </div>
+                    <span t-if="state.options.partner_id" class="badge rounded-pill text-bg-light border d-inline-flex align-items-center gap-1">
+                        <t t-esc="state.options.partner_name"/>
+                        <a href="#" class="text-reset" title="Show all partners" aria-label="Show all partners"
+                           t-on-click.prevent="clearPartner"><i class="fa fa-times"/></a>
+                    </span>
                     <div class="ms-auto d-flex gap-1" t-if="reportKey !== 'trial_balance'">
                         <button class="btn btn-link btn-sm" t-on-click="() => this.foldAll(false)">Unfold all</button>
                         <button class="btn btn-link btn-sm" t-on-click="() => this.foldAll(true)">Fold all</button>
@@ -79,6 +84,12 @@
                                         <i t-att-class="'fa fa-fw ' + (isOpen(line) ? 'fa-caret-down' : 'fa-caret-right')"/>
                                         <t t-esc="line.name"/>
                                     </a>
+                                    <button t-if="canReconcile(line)" type="button"
+                                            class="btn btn-link btn-sm py-0 ms-2 o_dl_reconcile"
+                                            title="Select and reconcile this partner's open items"
+                                            t-on-click.stop="() => this.reconcilePartner(line)">
+                                        <i class="fa fa-link me-1"/>Reconcile
+                                    </button>
                                 </t>
                                 <t t-elif="isClickable(line)">
                                     <a href="#" t-on-click.prevent="() => this.openLine(line)" t-esc="line.name"/>

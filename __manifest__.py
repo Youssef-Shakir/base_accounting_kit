@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'DoniaLink Accounting',
-    'version': '18.0.5.1.0',
+    'version': '18.0.5.2.0',
     'category': 'Accounting',
     'summary': 'Full accounting for Odoo Community: financial reports, assets, budgets, PDC, follow-ups, day/bank/cash books',
     'description': """
@@ -109,6 +109,8 @@ Developed by Yousif Shakir - Donialink | تطوير يوسف شاكر
         'report/multiple_invoice_report_template.xml',
         'report/res_partner_reports.xml',
         'report/res_partner_templates.xml',
+        'report/partner_statement_template.xml',
+        'wizard/partner_statement_views.xml',
         'views/account_recurring_payments_view.xml',
         'views/account_move_line_views.xml',
         'views/account_bank_statement_views.xml',

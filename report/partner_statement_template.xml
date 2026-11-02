@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Statement of account of a contact (DoniaLink) -->
+    <record id="action_report_partner_statement" model="ir.actions.report">
+        <field name="name">Statement of Account</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">base_accounting_kit.report_partner_statement</field>
+        <field name="report_file">base_accounting_kit.report_partner_statement</field>
+        <field name="print_report_name">'Statement - %s' % (object.commercial_partner_id.name)</field>
+    </record>
+
+    <template id="report_partner_statement">
+        <t t-call="web.html_container">
+            <t t-foreach="statements" t-as="st">
+                <t t-call="web.external_layout">
+                    <t t-set="o" t-value="st['partner']"/>
+                    <t t-set="money" t-value="{'widget': 'monetary', 'display_currency': st['currency']}"/>
+                    <div class="page">
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div t-field="o.self" t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True}'/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <h3 class="mb-1">Statement of Account</h3>
+                                <div>
+                                    <span t-esc="st['date_from']" t-options='{"widget": "date"}'/> -
+                                    <span t-esc="st['date_to']" t-options='{"widget": "date"}'/>
+                                </div>
+                                <div class="text-muted small">
+                                    <t t-if="st['account_type'] == 'payable'">Payable</t>
+                                    <t t-elif="st['account_type'] == 'both'">Receivable and Payable</t>
+                                    <t t-else="">Receivable</t>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-sm o_main_table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Reference</th>
+                                    <th>Description</th>
+                                    <th>Due Date</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                    <th class="text-end">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="fw-bold">
+                                    <td colspan="6">Opening Balance</td>
+                                    <td class="text-end text-nowrap" t-esc="st['opening']" t-options="money"/>
+                                </tr>
+                                <tr t-foreach="st['lines']" t-as="line">
+                                    <td class="text-nowrap" t-esc="line['date']" t-options='{"widget": "date"}'/>
+                                    <td class="text-nowrap" t-esc="line['reference']"/>
+                                    <td t-esc="line['description']"/>
+                                    <td class="text-nowrap"><t t-if="line['due_date']" t-esc="line['due_date']" t-options='{"widget": "date"}'/></td>
+                                    <td class="text-end text-nowrap"><t t-if="line['debit']" t-esc="line['debit']" t-options="money"/></td>
+                                    <td class="text-end text-nowrap"><t t-if="line['credit']" t-esc="line['credit']" t-options="money"/></td>
+                                    <td class="text-end text-nowrap" t-esc="line['balance']" t-options="money"/>
+                                </tr>
+                                <tr t-if="not st['lines']">
+                                    <td colspan="7" class="text-center text-muted">No transactions in this period.</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold border-top">
+                                    <td colspan="4">Total</td>
+                                    <td class="text-end text-nowrap" t-esc="st['total_debit']" t-options="money"/>
+                                    <td class="text-end text-nowrap" t-esc="st['total_credit']" t-options="money"/>
+                                    <td/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="row justify-content-end mt-3">
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr class="fw-bold border-top border-dark">
+                                        <td t-esc="st['closing_label']"/>
+                                        <td class="text-end text-nowrap" t-esc="st['closing']" t-options="money"/>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div t-if="st['ageing']" class="mt-4" style="page-break-inside: avoid;">
+                            <h6>Open items by age</h6>
+                            <table class="table table-sm table-bordered text-center">
+                                <thead>
+                                    <tr><th t-foreach="st['ageing']" t-as="bucket" t-esc="bucket['name']"/></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td t-foreach="st['ageing']" t-as="bucket" class="text-nowrap" t-esc="bucket['amount']" t-options="money"/></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

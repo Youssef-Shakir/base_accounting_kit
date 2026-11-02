@@ -40,4 +40,31 @@
             </list>
         </field>
     </record>
+<!--  Partner items to reconcile, opened from the partner ledger (DoniaLink)  -->
+    <record id="account_move_line_view_list_reconcile" model="ir.ui.view">
+        <field name="name">account.move.line.view.list.reconcile</field>
+        <field name="model">account.move.line</field>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <list edit="false" create="false" default_order="date, move_name, id">
+                <header>
+                    <button name="action_dl_reconcile" type="object" string="Reconcile"
+                            class="btn-primary"/>
+                    <button name="action_dl_unreconcile" type="object" string="Unreconcile"/>
+                </header>
+                <field name="company_currency_id" column_invisible="1"/>
+                <field name="date"/>
+                <field name="move_id"/>
+                <field name="account_id"/>
+                <field name="name"/>
+                <field name="ref" optional="hide"/>
+                <field name="date_maturity" optional="show"/>
+                <field name="debit" sum="Debit"/>
+                <field name="credit" sum="Credit"/>
+                <field name="amount_residual" string="Open Amount" sum="Open Amount"
+                       decoration-danger="amount_residual &lt; 0"/>
+                <field name="matching_number" string="Matching"/>
+            </list>
+        </field>
+    </record>
 </odoo>

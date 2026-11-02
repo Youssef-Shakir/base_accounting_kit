@@ -776,6 +776,7 @@ msgstr "المدفوعات المحاسبية المتكررة"
 #: model:ir.model.fields,field_description:base_accounting_kit.field_account_day_book_report__account_ids
 #: model:ir.model.fields,field_description:base_accounting_kit.field_account_financial_report__account_ids
 #: model:ir.model.fields.selection,name:base_accounting_kit.selection__account_financial_report__type__accounts
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__account_type
 msgid "Accounts"
 msgstr "الحسابات"
 
@@ -1236,6 +1237,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_trial_balance
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.res_partner_statement_report_template
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_partner_form
+#: code:addons/base_accounting_kit/models/res_partner_statement.py:0
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Balance"
 msgstr "الرصيد"
 
@@ -1751,6 +1755,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:base_accounting_kit.field_kit_account_tax_report__create_uid
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice__create_uid
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice_layout__create_uid
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__create_uid
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
@@ -1784,6 +1789,7 @@ msgstr "أنشئ بواسطة"
 #: model:ir.model.fields,field_description:base_accounting_kit.field_kit_account_tax_report__create_date
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice__create_date
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice_layout__create_date
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__create_date
 msgid "Created on"
 msgstr "أنشئ في"
 
@@ -1801,6 +1807,9 @@ msgstr "أنشئ في"
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_journal_audit
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partnerledger
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_trial_balance
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.account_move_line_view_list_reconcile
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Credit"
 msgstr "دائن"
 
@@ -1940,6 +1949,8 @@ msgstr "التقارير اليومية"
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_journal_audit
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partnerledger
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.res_partner_statement_report_template
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Date"
 msgstr "التاريخ"
 
@@ -2024,6 +2035,9 @@ msgstr "أيام"
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_journal_audit
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partnerledger
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_trial_balance
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.account_move_line_view_list_reconcile
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Debit"
 msgstr "مدين"
 
@@ -2153,7 +2167,10 @@ msgid "Depreciation line posted."
 msgstr ""
 
 #. module: base_accounting_kit
+#. odoo-python
 #: model:ir.model.fields,field_description:base_accounting_kit.field_account_recurring_payments__description
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Description"
 msgstr "وصف"
 
@@ -2218,6 +2235,7 @@ msgstr "عرض أعمدة الخصم / الائتمان"
 #: model:ir.model.fields,field_description:base_accounting_kit.field_kit_account_tax_report__display_name
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice__display_name
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice_layout__display_name
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__display_name
 msgid "Display Name"
 msgstr "الاسم المعروض"
 
@@ -2309,6 +2327,8 @@ msgstr "إجمالي البيع"
 #. odoo-python
 #: code:addons/base_accounting_kit/models/dynamic_report_ledgers.py:0
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.res_partner_statement_report_template
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Due Date"
 msgstr "تاريخ الاستحقاق"
 
@@ -2381,6 +2401,7 @@ msgstr "تاريخ الانتهاء"
 #. module: base_accounting_kit
 #. odoo-javascript
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__target_move
 msgid "Entries"
 msgstr "القيود"
 
@@ -2626,6 +2647,7 @@ msgstr "شكل"
 #. module: base_accounting_kit
 #. odoo-javascript
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__date_from
 msgid "From"
 msgstr "من"
 
@@ -2803,6 +2825,7 @@ msgstr "عرضي"
 #: model:ir.model.fields,field_description:base_accounting_kit.field_kit_account_tax_report__id
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice__id
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice_layout__id
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__id
 msgid "ID"
 msgstr "المُعرف"
 
@@ -2909,6 +2932,7 @@ msgstr "قم بتضمين الأرصدة الأولية"
 #. module: base_accounting_kit
 #. odoo-javascript
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+#: model:ir.model.fields.selection,name:base_accounting_kit.selection__partner_statement_wizard__target_move__all
 msgid "Including drafts"
 msgstr "تشمل المسودات"
 
@@ -3231,6 +3255,7 @@ msgstr "البيان"
 #: model:ir.model.fields,field_description:base_accounting_kit.field_kit_account_tax_report__write_uid
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice__write_uid
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice_layout__write_uid
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__write_uid
 msgid "Last Updated by"
 msgstr "آخر تحديث بواسطة"
 
@@ -3264,6 +3289,7 @@ msgstr "آخر تحديث بواسطة"
 #: model:ir.model.fields,field_description:base_accounting_kit.field_kit_account_tax_report__write_date
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice__write_date
 #: model:ir.model.fields,field_description:base_accounting_kit.field_multiple_invoice_layout__write_date
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__write_date
 msgid "Last Updated on"
 msgstr "آخر تحديث في"
 
@@ -3856,6 +3882,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_general_ledger
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_journal_audit
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_bank_reconcile_widget_form
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__partner_id
 msgid "Partner"
 msgstr "الشريك"
 
@@ -3951,6 +3978,8 @@ msgstr "وقت الدفع"
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.js:0
 #: model:ir.model.fields.selection,name:base_accounting_kit.selection__account_account_type__type__payable
 #: model:ir.model.fields.selection,name:base_accounting_kit.selection__account_financial_report__account_type_ids__liability_payable
+#: model:ir.model.fields.selection,name:base_accounting_kit.selection__partner_statement_wizard__account_type__payable
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Payable"
 msgstr "الدائنون"
 
@@ -4090,6 +4119,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/base_accounting_kit/models/dynamic_report.py:0
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+#: model:ir.model.fields.selection,name:base_accounting_kit.selection__partner_statement_wizard__target_move__posted
 msgid "Posted entries"
 msgstr "القيود المرحّلة"
 
@@ -4248,6 +4278,8 @@ msgstr "السبب"
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.js:0
 #: model:ir.model.fields.selection,name:base_accounting_kit.selection__account_account_type__type__receivable
 #: model:ir.model.fields.selection,name:base_accounting_kit.selection__account_financial_report__account_type_ids__asset_receivable
+#: model:ir.model.fields.selection,name:base_accounting_kit.selection__partner_statement_wizard__account_type__receivable
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Receivable"
 msgstr "المدينون"
 
@@ -4262,6 +4294,8 @@ msgstr "حسابات القبض"
 #. module: base_accounting_kit
 #. odoo-javascript
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.js:0
+#: model:ir.model.fields.selection,name:base_accounting_kit.selection__partner_statement_wizard__account_type__both
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Receivable and Payable"
 msgstr "المدينون والدائنون"
 
@@ -4351,7 +4385,10 @@ msgid "Ref"
 msgstr ""
 
 #. module: base_accounting_kit
+#. odoo-python
 #: model:ir.model.fields,field_description:base_accounting_kit.field_account_asset_asset__code
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Reference"
 msgstr "مرجع"
 
@@ -4888,6 +4925,7 @@ msgstr "تم حذف التقرير القياسي \"%s\"."
 #. module: base_accounting_kit
 #. odoo-python
 #: code:addons/base_accounting_kit/models/dynamic_report.py:0
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
 msgid "The start date must be before the end date."
 msgstr "يجب أن يكون تاريخ البداية قبل تاريخ النهاية."
 
@@ -5011,6 +5049,7 @@ msgstr ""
 #. module: base_accounting_kit
 #. odoo-javascript
 #: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+#: model:ir.model.fields,field_description:base_accounting_kit.field_partner_statement_wizard__date_to
 msgid "To"
 msgstr "إلى"
 
@@ -5058,6 +5097,7 @@ msgstr ""
 #: code:addons/base_accounting_kit/models/dynamic_report_ledgers.py:0
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_agedpartnerbalance
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.res_partner_statements_view_tree
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
 msgid "Total"
 msgstr "الإجمالي"
 
@@ -5536,3 +5576,178 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.account_journal_dashboard_kanban_view
 msgid "to Reconcile"
 msgstr ""
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/dynamic_report_ledgers.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.account_move_line_view_list_reconcile
+msgid "Matching"
+msgstr "المطابقة"
+
+#. module: base_accounting_kit
+#. odoo-javascript
+#: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.account_move_line_view_list_reconcile
+msgid "Reconcile"
+msgstr "تسوية"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.account_move_line_view_list_reconcile
+msgid "Unreconcile"
+msgstr "إلغاء التسوية"
+
+#. module: base_accounting_kit
+#. odoo-javascript
+#: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+msgid "Select and reconcile this partner's open items"
+msgstr "اختر البنود المفتوحة لهذا الشريك وقم بتسويتها"
+
+#. module: base_accounting_kit
+#. odoo-javascript
+#: code:addons/base_accounting_kit/static/src/dynamic_report/dynamic_report.xml:0
+msgid "Show all partners"
+msgstr "عرض كل الشركاء"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/dynamic_report_ledgers.py:0
+msgid "Items without a partner cannot be reconciled from here."
+msgstr "لا يمكن تسوية البنود التي ليس لها شريك من هنا."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/dynamic_report_ledgers.py:0
+msgid "Reconcile: %s"
+msgstr "تسوية: %s"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/account_move_line_reconcile.py:0
+msgid "Select open posted items on a reconcilable account."
+msgstr "اختر بنوداً مرحّلة مفتوحة على حساب قابل للتسوية."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/account_move_line_reconcile.py:0
+msgid "Select items of one company only."
+msgstr "اختر بنوداً لشركة واحدة فقط."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/account_move_line_reconcile.py:0
+msgid "%s: select at least one debit and one credit item to reconcile."
+msgstr "%s: اختر بنداً مديناً واحداً وبنداً دائناً واحداً على الأقل للتسوية."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/account_move_line_reconcile.py:0
+msgid "%s items reconciled."
+msgstr "تمت تسوية %s بند."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/account_move_line_reconcile.py:0
+msgid "%s items unreconciled."
+msgstr "تم إلغاء تسوية %s بند."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/account_move_line_reconcile.py:0
+msgid "The selected items are not reconciled."
+msgstr "البنود المختارة غير مسوّاة."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/res_partner_statement.py:0
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model:ir.actions.report,name:base_accounting_kit.action_report_partner_statement
+#: model:ir.model,name:base_accounting_kit.model_partner_statement_wizard
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.partner_statement_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_partner_form
+msgid "Statement of Account"
+msgstr "كشف حساب"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
+msgid "Opening Balance"
+msgstr "الرصيد الافتتاحي"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/res_partner_statement.py:0
+msgid "Balance due by %s"
+msgstr "الرصيد المستحق على %s"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/models/res_partner_statement.py:0
+msgid "Balance due to %s"
+msgstr "الرصيد المستحق لـ %s"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.partner_statement_wizard_view_form
+msgid "Excel"
+msgstr "إكسل"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.partner_statement_wizard_view_form
+msgid "Send by Email"
+msgstr "إرسال بالبريد الإلكتروني"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.partner_statement_wizard_view_form
+msgid "Open in Partner Ledger"
+msgstr "فتح في دفتر أستاذ الشركاء"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_partner_form
+msgid "Open invoices"
+msgstr "الفواتير المفتوحة"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
+msgid "Open items by age"
+msgstr "البنود المفتوحة حسب العمر"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.report_partner_statement
+msgid "No transactions in this period."
+msgstr "لا توجد حركات في هذه الفترة."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+msgid "Statement of Account %(from)s - %(to)s"
+msgstr "كشف حساب %(from)s - %(to)s"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+msgid "<p>Dear %s,</p><p>Please find attached your statement of account.</p>"
+msgstr "<p>السيد/السيدة %s المحترم،</p><p>تجدون مرفقاً كشف حسابكم.</p>"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+msgid "Partner Ledger: %s"
+msgstr "دفتر أستاذ الشركاء: %s"
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+msgid "The partner no longer exists."
+msgstr "الشريك لم يعد موجوداً."
+
+#. module: base_accounting_kit
+#. odoo-python
+#: code:addons/base_accounting_kit/wizard/partner_statement.py:0
+msgid "Print the statement from the contact: Customer Statement › Statement of Account."
+msgstr "اطبع الكشف من جهة الاتصال: كشف حساب العميل › كشف حساب."
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_partner_form
+msgid "Opening balance, every invoice, payment and entry of the period with a running balance, closing balance and ageing."
+msgstr "الرصيد الافتتاحي وكل فاتورة ودفعة وقيد خلال الفترة مع الرصيد التراكمي والرصيد الختامي وأعمار الديون."

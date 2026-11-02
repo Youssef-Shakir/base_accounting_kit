@@ -10,6 +10,11 @@
             <xpath expr="//page[@name='sales_purchases']" position="after">
                 <page name="customer_statement_page"
                       string="Customer Statement">
+                    <button name="action_open_statement_wizard" type="object"
+                            class="btn-primary" icon="fa-file-text-o"
+                            string="Statement of Account"/>
+                    <div class="text-muted small mt-1 mb-3">Opening balance, every invoice, payment and entry of the period with a running balance, closing balance and ageing.</div>
+                    <div class="fw-bold">Open invoices</div>
                     <button name="action_print_pdf" type="object"
                             class="btn-secondary">
                         Print PDF

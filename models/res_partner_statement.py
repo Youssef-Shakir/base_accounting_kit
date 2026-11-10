@@ -26,6 +26,31 @@ class ResPartner(models.Model):
             'context': {'default_partner_id': self.commercial_partner_id.id},
         }
 
+    def _dl_statement_side(self):
+        """Receivable, payable or both, from the contact's entries: a vendor whose bills were recorded as
+        expenses to pay later has payable items even when it was never marked as a supplier."""
+        partner = self.commercial_partner_id
+        Line = self.env['account.move.line'].sudo()
+        base = [('partner_id', 'child_of', partner.id), ('parent_state', '=', 'posted'),
+                ('company_id', 'in', self.env.companies.ids)]
+        has_payable = bool(Line.search_count(base + [('account_id.account_type', '=', 'liability_payable')], limit=1))
+        has_receivable = bool(Line.search_count(base + [('account_id.account_type', '=', 'asset_receivable')],
+                                                limit=1))
+        if has_payable and has_receivable:
+            return 'both'
+        if has_payable or (partner.supplier_rank and not partner.customer_rank):
+            return 'payable'
+        if partner.supplier_rank and partner.customer_rank:
+            return 'both'
+        return 'receivable'
+
+    def action_view_statement(self):
+        """Statement of account on screen, this fiscal year to today, receivable / payable from the entries."""
+        self.ensure_one()
+        wizard = self.env['partner.statement.wizard'].with_context(
+            default_partner_id=self.commercial_partner_id.id).create({})
+        return wizard.action_view()
+
     def _dl_statement(self, date_from, date_to, account_type='receivable', target_move='posted'):
         """Statement values of the commercial partner; balances are debit - credit, shown
         as amounts owed to the partner (credit - debit) on a payable-only statement."""

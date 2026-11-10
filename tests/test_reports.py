@@ -366,6 +366,27 @@ class TestPartnerReconcileAndStatement(TransactionCase):
         self.assertAlmostEqual(later['opening'], 50.0, 2)
         self.assertFalse(later['lines'])
 
+    def test_vendor_statement_on_screen(self):
+        """A vendor never marked as supplier (its bill came from an expense to pay later) gets its payable
+        statement, and it opens on screen."""
+        vendor = self.env['res.partner'].create({'name': 'Statement Test Vendor'})
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice', 'partner_id': vendor.id, 'invoice_date': '2026-03-07',
+            'invoice_line_ids': [(0, 0, {'name': 'Flour', 'quantity': 1, 'price_unit': 80.0, 'tax_ids': []})],
+        })
+        bill.action_post()
+        vendor.supplier_rank = 0
+        self.assertEqual(vendor._dl_statement_side(), 'payable')
+        wizard = self.env['partner.statement.wizard'].with_context(default_partner_id=vendor.id).create(
+            {'date_from': '2026-03-01', 'date_to': '2026-03-31'})
+        self.assertEqual(wizard.account_type, 'payable')
+        view = wizard.action_view()
+        self.assertEqual(view['report_type'], 'qweb-html')
+        html = self.env['ir.actions.report']._render_qweb_html(view['report_name'], vendor.ids, data=view['data'])[0]
+        self.assertIn(bill.name.encode(), html)
+        self.assertEqual(vendor.action_view_statement()['report_type'], 'qweb-html')
+        self.assertEqual(self.partner._dl_statement_side(), 'receivable')
+
     def test_statement_outputs(self):
         wizard = self.env['partner.statement.wizard'].with_context(
             default_partner_id=self.partner.id).create({'date_from': '2026-03-01', 'date_to': '2026-03-31'})

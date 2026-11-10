@@ -40,11 +40,7 @@ class PartnerStatementWizard(models.TransientModel):
         values = super().default_get(fields_list)
         partner = self.env['res.partner'].browse(values.get('partner_id'))
         if partner and 'account_type' in fields_list:
-            # a supplier gets its payable statement, a contact that is both gets both sides
-            if partner.supplier_rank and partner.customer_rank:
-                values['account_type'] = 'both'
-            elif partner.supplier_rank:
-                values['account_type'] = 'payable'
+            values['account_type'] = partner._dl_statement_side()
         return values
 
     @api.constrains('date_from', 'date_to')
@@ -62,6 +58,11 @@ class PartnerStatementWizard(models.TransientModel):
     def _file_name(self, extension):
         return '%s - %s %s.%s' % (_('Statement'), self.partner_id.commercial_partner_id.display_name,
                                   fields.Date.to_string(self.date_to), extension)
+
+    def action_view(self):
+        """The statement on screen, like a report preview (print it from there only when needed)."""
+        return self.env.ref('base_accounting_kit.action_report_partner_statement_html').report_action(
+            self.partner_id, data=self._report_data())
 
     def action_print_pdf(self):
         return self.env.ref('base_accounting_kit.action_report_partner_statement').report_action(

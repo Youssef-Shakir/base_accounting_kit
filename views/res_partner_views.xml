@@ -7,12 +7,22 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_statement" type="object" class="oe_stat_button" icon="fa-list-alt"
+                        groups="account.group_account_invoice,account.group_account_readonly">
+                    <div class="o_stat_info"><span class="o_stat_text">Statement</span></div>
+                </button>
+            </xpath>
             <xpath expr="//page[@name='sales_purchases']" position="after">
                 <page name="customer_statement_page"
-                      string="Customer Statement">
+                      string="Statement">
+                    <button name="action_view_statement" type="object"
+                            class="btn-primary me-2" icon="fa-eye"
+                            groups="account.group_account_invoice,account.group_account_readonly"
+                            string="View Statement"/>
                     <button name="action_open_statement_wizard" type="object"
-                            class="btn-primary" icon="fa-file-text-o"
-                            string="Statement of Account"/>
+                            class="btn-secondary" icon="fa-file-text-o"
+                            string="Statement of Account..."/>
                     <div class="text-muted small mt-1 mb-3">Opening balance, every invoice, payment and entry of the period with a running balance, closing balance and ageing.</div>
                     <div class="fw-bold">Open invoices</div>
                     <button name="action_print_pdf" type="object"

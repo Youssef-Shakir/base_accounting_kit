@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'DoniaLink Accounting',
-    'version': '18.0.5.2.0',
+    'version': '18.0.5.3.0',
     'category': 'Accounting',
     'summary': 'Full accounting for Odoo Community: financial reports, assets, budgets, PDC, follow-ups, day/bank/cash books',
     'description': """

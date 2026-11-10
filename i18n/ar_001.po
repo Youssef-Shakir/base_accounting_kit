@@ -5751,3 +5751,13 @@ msgstr "اطبع الكشف من جهة الاتصال: كشف حساب العم
 #: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_partner_form
 msgid "Opening balance, every invoice, payment and entry of the period with a running balance, closing balance and ageing."
 msgstr "الرصيد الافتتاحي وكل فاتورة ودفعة وقيد خلال الفترة مع الرصيد التراكمي والرصيد الختامي وأعمار الديون."
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_partner_form
+msgid "View Statement"
+msgstr "عرض كشف الحساب"
+
+#. module: base_accounting_kit
+#: model_terms:ir.ui.view,arch_db:base_accounting_kit.view_partner_form
+msgid "Statement of Account..."
+msgstr "كشف الحساب..."

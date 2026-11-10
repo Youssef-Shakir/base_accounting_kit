@@ -9,6 +9,15 @@
         <field name="report_file">base_accounting_kit.report_partner_statement</field>
         <field name="print_report_name">'Statement - %s' % (object.commercial_partner_id.name)</field>
     </record>
+    <!-- The same statement on screen (no PDF): opened from the contact or the statement wizard -->
+    <record id="action_report_partner_statement_html" model="ir.actions.report">
+        <field name="name">Statement of Account</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">base_accounting_kit.report_partner_statement</field>
+        <field name="report_file">base_accounting_kit.report_partner_statement</field>
+        <field name="binding_type">report</field>
+    </record>
 
     <template id="report_partner_statement">
         <t t-call="web.html_container">
